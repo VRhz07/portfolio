@@ -32,3 +32,24 @@ for (const project of portfolioProjects) {
   }
   list.append(card);
 }
+
+// The preference is optional: the toggle still works when storage is unavailable.
+const themeToggle = document.querySelector('.theme-toggle');
+const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+let explicitTheme = false;
+try { explicitTheme = ['dark', 'light'].includes(localStorage.getItem('portfolio-theme')); } catch {}
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeToggle.setAttribute('aria-pressed', String(theme === 'dark'));
+}
+applyTheme(document.documentElement.dataset.theme || (systemTheme.matches ? 'dark' : 'light'));
+themeToggle.hidden = false;
+themeToggle.addEventListener('click', () => {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  explicitTheme = true;
+  applyTheme(theme);
+  try { localStorage.setItem('portfolio-theme', theme); } catch {}
+});
+systemTheme.addEventListener('change', event => {
+  if (!explicitTheme) applyTheme(event.matches ? 'dark' : 'light');
+});
