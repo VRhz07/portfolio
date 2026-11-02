@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Case study: Active Directory &amp; Windows Server 2022 homelab by Harvey Verian. OU structure, NTFS permissions, GPO deployment and troubleshooting on a VirtualBox lab network.">
+  <title>AD Homelab Case Study | Harvey Verian</title>
+  <script>
+    try { const s = localStorage.getItem('portfolio-theme'); document.documentElement.dataset.theme = s === 'dark' || s === 'light' ? s : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  </script>
+  <link rel="stylesheet" href="portfolio.css">
+  <link rel="stylesheet" href="ad-homelab.css">
+  <script src="portfolio.js" defer></script>
+  <script src="ad-homelab.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <nav class="wrap" aria-label="Main navigation">
+      <a class="brand" href="index.html">HV<span> / IT SUPPORT</span></a>
+      <div class="nav-links">
+        <a href="index.html#projects">Projects</a>
+        <a href="index.html#skills">Skills</a>
+        <a href="index.html#experience">Experience</a>
+        <a href="index.html#contact">Contact ↗</a>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false" hidden><span aria-hidden="true">◐</span> <span>Dark mode</span></button>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- ── Breadcrumb ── -->
+    <div class="cs-breadcrumb wrap">
+      <a href="index.html#projects">← Back to Projects</a>
+    </div>
+
+    <!-- ── Hero ── -->
+    <section class="cs-hero wrap">
+      <div class="cs-hero-copy">
+        <p class="eyebrow">01 / ISOLATED PERSONAL HOMELAB</p>
+        <h1>Active Directory &amp; Windows Server Administration Homelab</h1>
+        <p class="cs-hero-summary">I built a small Windows domain lab in Oracle VirtualBox to practice common entry-level IT Support tasks. Using Windows Server 2022 and an isolated Windows 7 test client, I configured Active Directory users and groups, departmental shared folders, and a targeted Control Panel restriction policy. I documented both successful configurations and a GPO troubleshooting exercise involving a missing Read permission.</p>
+        <div class="cs-hero-tags">
+          <span class="cs-tag">Active Directory</span>
+          <span class="cs-tag">Windows Server 2022</span>
+          <span class="cs-tag">Group Policy</span>
+          <span class="cs-tag">NTFS Permissions</span>
+          <span class="cs-tag">VirtualBox</span>
+        </div>
+      </div>
+      <figure class="cs-hero-thumb">
+        <img src="assets/img/Project/active-directory-homelab/01-AD-OU-Structure.png"
+             alt="Active Directory Users and Computers showing the LAB.local domain tree with departmental OUs under Accounts (Finance, HR, IT, Nursing) and a Groups OU"
+             loading="eager">
+        <figcaption>OU structure — LAB.local on ABC-Hospital-DC01</figcaption>
+      </figure>
+    </section>
+
+    <!-- ── Overview grid ── -->
+    <section class="cs-overview tinted">
+      <div class="wrap cs-overview-grid">
+        <div>
+          <p class="eyebrow">ENVIRONMENT</p>
+          <ul class="cs-env-list">
+            <li><strong>Hypervisor</strong> Oracle VirtualBox (Windows laptop host, 8 GB RAM)</li>
+            <li><strong>Domain controller</strong> Windows Server 2022 Standard Evaluation — ABC-Hospital-DC01</li>
+            <li><strong>Domain</strong> LAB.local · IP 192.168.56.10 (host-only)</li>
+            <li><strong>Test client</strong> Windows 7 Professional 32-bit — isolated lab use only, no internet exposure</li>
+            <li><strong>Services</strong> AD DS, DNS</li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow">OBJECTIVES</p>
+          <ul class="cs-env-list">
+            <li>Practice user account management in a realistic departmental structure</li>
+            <li>Configure least-privilege shared-folder access with NTFS and share permissions</li>
+            <li>Deploy and troubleshoot a targeted Group Policy restriction</li>
+            <li>Verify policy behaviour using gpresult on both restricted and unrestricted users</li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow">SCOPE &amp; LIMITS</p>
+          <ul class="cs-env-list">
+            <li>Personal learning lab — not a production or enterprise environment</li>
+            <li>Windows 7 client is unsupported and kept isolated with no internet access</li>
+            <li>Simulated helpdesk tickets are guided exercises, not real incident records</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Implementation ── -->
+    <section class="cs-section wrap" id="implementation">
+      <div class="cs-section-head">
+        <p class="eyebrow">IMPLEMENTATION</p>
+        <h2>What I configured</h2>
+      </div>
+
+      <!-- AD Organisation -->
+      <div class="cs-block">
+        <h3>Active Directory Organisation</h3>
+        <p>I organised AD Users and Computers with departmental OUs nested under an <strong>Accounts</strong> parent: Finance Accounts, HR Accounts, IT Accounts, and Nursing Accounts. Additional OUs — Groups, GPO-Test, and a nested Sub-Test — support policy and group management.</p>
+        <p>Security groups created: Finance, HR, IT, Nursing, Finance-Confidential, Nursing-Confidential, and ControlPanelRestricted. I practiced user creation, password resets, account unlocks, and group membership changes as simulated support tasks.</p>
+      </div>
+
+      <div class="cs-gallery" aria-label="Active Directory organisation screenshots">
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/01-AD-OU-Structure.png" class="cs-lightbox-trigger" aria-label="View full-size: OU and group structure">
+            <img src="assets/img/Project/active-directory-homelab/01-AD-OU-Structure.png"
+                 alt="Active Directory Users and Computers tree for LAB.local showing Accounts OU with Finance, HR, IT, and Nursing sub-OUs; Groups OU; GPO-Test OU with Sub-Test child"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 1</strong> — OU and group structure in AD Users and Computers</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/02-AD-Department-Users.png" class="cs-lightbox-trigger" aria-label="View full-size: departmental OU with example users">
+            <img src="assets/img/Project/active-directory-homelab/02-AD-Department-Users.png"
+                 alt="Nursing Accounts OU expanded, showing example user accounts within the department"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 2</strong> — Departmental OU with example user accounts</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/03-AD-Group-Membership.png" class="cs-lightbox-trigger" aria-label="View full-size: test user group membership">
+            <img src="assets/img/Project/active-directory-homelab/03-AD-Group-Membership.png"
+                 alt="User properties Member Of tab showing Nursing and Nursing-Confidential group memberships for a test user"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 3</strong> — Test user's Nursing and Nursing-Confidential group membership</figcaption>
+        </figure>
+      </div>
+
+      <!-- File permissions -->
+      <div class="cs-block">
+        <h3>Shared Folders &amp; NTFS Permissions</h3>
+        <p>I created departmental shared folders under <code>C:\Shares\</code> and applied group-based NTFS permissions. The main Nursing folder (<code>C:\Shares\Nursing</code>) has a share ACL of <strong>Everyone — Full Control</strong> at the share level, with access constrained by NTFS ACL entries granting <em>Modify</em> to the Nursing and Nursing-Confidential groups.</p>
+        <p>The confidential subfolder (<code>C:\Shares\Nursing\Confidential</code>) has NTFS inheritance disabled, with Modify granted only to Nursing-Confidential. This is configuration evidence; access denial for an unauthorised user was not independently tested in the lab.</p>
+      </div>
+
+      <div class="cs-gallery" aria-label="File permission screenshots">
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/04-NTFS-Nursing-Permissions.png" class="cs-lightbox-trigger" aria-label="View full-size: Nursing folder NTFS ACL">
+            <img src="assets/img/Project/active-directory-homelab/04-NTFS-Nursing-Permissions.png"
+                 alt="Security tab for C:\Shares\Nursing showing Nursing and Nursing-Confidential groups with Modify permission"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 4</strong> — Main Nursing folder NTFS ACL (Nursing group Modify)</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/05-Nursing-Share-Permissions.png" class="cs-lightbox-trigger" aria-label="View full-size: Nursing share ACL">
+            <img src="assets/img/Project/active-directory-homelab/05-Nursing-Share-Permissions.png"
+                 alt="Share Permissions tab for the Nursing share showing Everyone with Full Control at the share level"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 5</strong> — Share ACL: Everyone Full Control (access scoped by NTFS below)</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/06-Nursing-Confidential-NTFS-Permissions.png" class="cs-lightbox-trigger" aria-label="View full-size: Nursing Confidential NTFS ACL">
+            <img src="assets/img/Project/active-directory-homelab/06-Nursing-Confidential-NTFS-Permissions.png"
+                 alt="Security tab for the Nursing\Confidential subfolder with inheritance disabled and Nursing-Confidential group granted Modify"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 6</strong> — Confidential subfolder: inheritance disabled, Nursing-Confidential Modify only</figcaption>
+        </figure>
+      </div>
+
+      <!-- GPO -->
+      <div class="cs-block">
+        <h3>Group Policy — Control Panel Restriction</h3>
+        <p>I created a GPO named <strong>gpo-restricted-cpanel</strong>, linked it to the GPO-Test OU, and enabled <em>Prohibit access to Control Panel and PC settings</em> under User Configuration.</p>
+        <p>Security filtering targets only the <strong>ControlPanelRestricted</strong> group: Authenticated Users retains Read-only access (required for GPO processing), while ControlPanelRestricted has Read + Apply Group Policy.</p>
+        <div class="cs-note">
+          <strong>Note on Fig. 9:</strong> The security filtering screenshot was taken before removing an extra GPO link to the Groups OU. The final configured state has only the intended GPO-Test link.
+        </div>
+      </div>
+
+      <div class="cs-gallery cs-gallery--wide" aria-label="GPO setup screenshots">
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/07-GPO-Link-Configuration.png" class="cs-lightbox-trigger" aria-label="View full-size: GPO link configuration">
+            <img src="assets/img/Project/active-directory-homelab/07-GPO-Link-Configuration.png"
+                 alt="Group Policy Management console showing gpo-restricted-cpanel linked to the GPO-Test OU under LAB.local"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 7</strong> — GPO linked to GPO-Test OU</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/08-GPO-Control-Panel-Restriction.png" class="cs-lightbox-trigger" aria-label="View full-size: GPO policy setting">
+            <img src="assets/img/Project/active-directory-homelab/08-GPO-Control-Panel-Restriction.png"
+                 alt="Group Policy Management Editor showing Prohibit access to Control Panel and PC settings set to Enabled"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 8</strong> — Control Panel restriction policy set to Enabled</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/09-GPO-Security-Filtering.png" class="cs-lightbox-trigger" aria-label="View full-size: security filtering (pre-cleanup state)">
+            <img src="assets/img/Project/active-directory-homelab/09-GPO-Security-Filtering.png"
+                 alt="Scope tab of gpo-restricted-cpanel showing ControlPanelRestricted in security filtering and GPO links (pre-cleanup, includes an extra link to Groups OU)"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 9</strong> — Security filter targeting ControlPanelRestricted (pre-cleanup state — extra link to Groups OU was later removed)</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/10A-GPO-Delegation-Permissions.png" class="cs-lightbox-trigger" aria-label="View full-size: ControlPanelRestricted delegation permissions">
+            <img src="assets/img/Project/active-directory-homelab/10A-GPO-Delegation-Permissions.png"
+                 alt="Delegation tab showing ControlPanelRestricted group with Read and Apply Group Policy permissions"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 10A</strong> — ControlPanelRestricted: Read + Apply Group Policy</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/10B-GPO-Authenticated-Users-Read.png" class="cs-lightbox-trigger" aria-label="View full-size: Authenticated Users Read-only permission">
+            <img src="assets/img/Project/active-directory-homelab/10B-GPO-Authenticated-Users-Read.png"
+                 alt="Delegation tab showing Authenticated Users with Read permission only — required for GPO processing"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 10B</strong> — Authenticated Users: Read-only (required for GPO processing)</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ── Troubleshooting ── -->
+    <section class="cs-section tinted" id="troubleshooting">
+      <div class="wrap">
+        <div class="cs-section-head">
+          <p class="eyebrow">TROUBLESHOOTING</p>
+          <h2>GPO not applying — missing Read permission</h2>
+        </div>
+        <div class="cs-block">
+          <p>During testing, <code>gpresult /r</code> showed <strong>gpo-restricted-cpanel</strong> was not applied to the test user's session, with no clear reason code. After reviewing the Delegation tab, I found that <strong>Authenticated Users had been removed</strong> from the GPO's security descriptor entirely.</p>
+          <p>When Authenticated Users lacks at least Read access, the client cannot read the GPO metadata during processing — even if the user is a member of the filtering group. Restoring Authenticated Users with Read-only access resolved the issue. I ran <code>gpupdate /force</code> and re-ran <code>gpresult /r</code> to confirm the policy appeared in the Applied GPOs list.</p>
+          <div class="cs-lesson">
+            <p class="eyebrow">KEY LESSON</p>
+            <p>Security filtering removes <em>Apply Group Policy</em> from Authenticated Users, but <strong>Read must be preserved</strong>. Removing Authenticated Users entirely breaks GPO processing for all users, regardless of which group is in the security filter.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Verification ── -->
+    <section class="cs-section wrap" id="verification">
+      <div class="cs-section-head">
+        <p class="eyebrow">VERIFICATION</p>
+        <h2>Restricted vs. unrestricted users</h2>
+      </div>
+      <div class="cs-block">
+        <p>I logged in as two different domain users to confirm the policy applied only where intended:</p>
+        <ul>
+          <li><strong>gpotest</strong> — member of ControlPanelRestricted. <code>gpresult /r</code> lists <em>gpo-restricted-cpanel</em> as applied; Control Panel is blocked.</li>
+          <li><strong>gpo-unrestricted</strong> — not a member of ControlPanelRestricted. <code>gpresult /r</code> shows the GPO filtered out due to security filtering; Control Panel remains accessible.</li>
+        </ul>
+      </div>
+
+      <div class="cs-gallery cs-gallery--wide" aria-label="GPO verification screenshots">
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/11-GPO-Applied-Verification.png" class="cs-lightbox-trigger" aria-label="View full-size: gpresult on restricted user">
+            <img src="assets/img/Project/active-directory-homelab/11-GPO-Applied-Verification.png"
+                 alt="Command prompt showing gpresult /r output for gpotest user with gpo-restricted-cpanel listed under Applied Group Policy Objects"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 11</strong> — gpresult /r: gpo-restricted-cpanel applied to gpotest</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/12-GPO-Control-Panel-Blocked.png" class="cs-lightbox-trigger" aria-label="View full-size: Control Panel blocked">
+            <img src="assets/img/Project/active-directory-homelab/12-GPO-Control-Panel-Blocked.png"
+                 alt="Windows dialog showing This operation has been cancelled due to restrictions in effect on this computer when opening Control Panel as gpotest"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 12</strong> — Control Panel blocked for gpotest by Group Policy</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/13A-GPO-Unrestricted-User-GPResult.png" class="cs-lightbox-trigger" aria-label="View full-size: gpresult for unrestricted user">
+            <img src="assets/img/Project/active-directory-homelab/13A-GPO-Unrestricted-User-GPResult.png"
+                 alt="Command prompt showing gpresult /r output for gpo-unrestricted user with gpo-restricted-cpanel listed under Denied GPOs with reason: Security Filtering"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 13A</strong> — gpresult /r: GPO filtered out for gpo-unrestricted (security filtering)</figcaption>
+        </figure>
+        <figure class="cs-shot">
+          <a href="assets/img/Project/active-directory-homelab/13B-GPO-Unrestricted-Control-Panel.png" class="cs-lightbox-trigger" aria-label="View full-size: Control Panel accessible for unrestricted user">
+            <img src="assets/img/Project/active-directory-homelab/13B-GPO-Unrestricted-Control-Panel.png"
+                 alt="Control Panel open and accessible on the desktop for the gpo-unrestricted user"
+                 loading="lazy">
+          </a>
+          <figcaption><strong>Fig. 13B</strong> — Control Panel accessible for gpo-unrestricted user</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ── Skills & lessons ── -->
+    <section class="cs-section tinted" id="skills-learned">
+      <div class="wrap">
+        <div class="cs-section-head">
+          <p class="eyebrow">SKILLS &amp; LESSONS</p>
+          <h2>What this lab practised</h2>
+        </div>
+        <div class="cs-skills-grid">
+          <article class="cs-skill-card">
+            <span class="cs-skill-num">01</span>
+            <h3>AD User &amp; Group Management</h3>
+            <p>Creating users, resetting passwords, unlocking accounts, managing group memberships, and organising OUs in a departmental structure.</p>
+          </article>
+          <article class="cs-skill-card">
+            <span class="cs-skill-num">02</span>
+            <h3>Shared Folders &amp; NTFS</h3>
+            <p>Configuring share-level and NTFS ACLs with role-based group access. Disabling inheritance for a restricted subfolder and understanding how the two permission layers interact.</p>
+          </article>
+          <article class="cs-skill-card">
+            <span class="cs-skill-num">03</span>
+            <h3>Group Policy Deployment</h3>
+            <p>Creating a GPO, linking it to an OU, enabling a user configuration policy, and applying security filtering so only a specific group is affected.</p>
+          </article>
+          <article class="cs-skill-card">
+            <span class="cs-skill-num">04</span>
+            <h3>GPO Troubleshooting</h3>
+            <p>Using <code>gpresult /r</code> to diagnose a policy not applying. Identifying a missing Authenticated Users Read permission as the root cause and verifying the fix.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Back link ── -->
+    <div class="cs-back wrap">
+      <a href="index.html#projects">← Back to Projects</a>
+    </div>
+
+  </main>
+
+  <!-- Lightbox overlay -->
+  <div class="cs-lightbox" id="cs-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer" hidden>
+    <button class="cs-lightbox-close" id="cs-lightbox-close" aria-label="Close screenshot viewer">✕</button>
+    <img class="cs-lightbox-img" id="cs-lightbox-img" src="" alt="">
+  </div>
+
+  <footer class="wrap">
+    <p>© 2026 Harvey Verian</p>
+    <p>Built around practice. Honest about progress.</p>
+    <a href="#home">Back to top ↑</a>
+  </footer>
+</body>
+</html>
+
