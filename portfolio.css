@@ -24,3 +24,35 @@
 [data-theme="dark"] :focus-visible{outline-color:#efc47a}
 @media(max-width:850px){nav{flex-wrap:wrap;justify-content:flex-start;padding-block:14px;gap:12px 20px}.nav-links{margin-left:auto}.theme-toggle{margin-left:auto}}
 @media(max-width:600px){.theme-toggle{font-size:11px;padding:6px 10px}.nav-links{gap:12px}nav .brand{margin-right:auto}.nav-links{margin-left:0}}
+
+
+/* Hero Identity & Profile Photo */
+.hero-identity{display:flex;align-items:center;gap:18px;margin-bottom:20px}
+.hero-photo{width:76px;height:76px;border-radius:50%;object-fit:cover;object-position:center top;border:2px solid var(--green);box-shadow:0 3px 10px rgba(0,0,0,.08);flex-shrink:0}
+.hero-identity .eyebrow{margin:0 0 4px}
+.role-badge{margin:0;font-size:12px;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase}
+
+/* Button & Action variations */
+.button--outline{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.button--outline:hover{background:var(--line);color:var(--ink)}
+.actions--secondary{margin-top:14px;gap:22px}
+
+/* Project card enhancements */
+.project-tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.project-tag{font-size:10px;font-weight:650;letter-spacing:.6px;background:var(--line);color:var(--ink);padding:4px 9px;border-radius:3px}
+.case-study-link{display:inline-flex;align-items:center;gap:6px;margin-top:16px;font-size:13px;font-weight:650;color:var(--green);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+.case-study-link:hover{border-bottom-color:var(--green)}
+
+/* Dark theme overrides */
+[data-theme="dark"] .hero-photo{border-color:var(--green);box-shadow:none}
+[data-theme="dark"] .role-badge{color:var(--green)}
+[data-theme="dark"] .button--outline{background:transparent;color:var(--ink);border-color:var(--line)}
+[data-theme="dark"] .button--outline:hover{background:var(--line);color:var(--ink)}
+[data-theme="dark"] .case-study-link{color:var(--green)}
+
+/* Responsive adjustments */
+@media(max-width:600px){
+  .hero-identity{gap:14px;margin-bottom:16px}
+  .hero-photo{width:64px;height:64px}
+  .actions--secondary{margin-top:12px;gap:16px}
+}
