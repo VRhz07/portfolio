@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Case study: Small Office Network Configuration and VLAN Segmentation by Harvey Verian. Cisco Packet Tracer lab with VLANs 10, 20, 30, router-on-a-stick routing, and DHCP.">
+  <title>Small Office Network Case Study | Harvey Verian</title>
+  <script>
+    try { const s = localStorage.getItem('portfolio-theme'); document.documentElement.dataset.theme = s === 'dark' || s === 'light' ? s : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  </script>
+  <link rel="stylesheet" href="portfolio.css">
+  <link rel="stylesheet" href="small-office-network.css">
+  <script src="portfolio.js" defer></script>
+  <script src="small-office-network.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <nav class="wrap" aria-label="Main navigation">
+      <a class="brand" href="index.html">HV<span> / IT SUPPORT</span></a>
+      <div class="nav-links">
+        <a href="index.html#projects">← Back to Projects</a>
+        <a href="index.html#skills">Skills</a>
+        <a href="index.html#experience">Experience</a>
+        <a href="index.html#contact">Contact ↗</a>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false" hidden><span aria-hidden="true">◐</span> <span>Dark mode</span></button>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- ── Breadcrumb ── -->
+    <div class="cs-breadcrumb wrap">
+      <a href="index.html#projects">← Back to Projects</a>
+    </div>
+
+    <!-- ── Hero ── -->
+    <section class="cs-hero wrap">
+      <div class="cs-hero-copy">
+        <p class="eyebrow">02 / PERSONAL PROJECT · CISCO PACKET TRACER</p>
+        <h1>Small Office Network Configuration and VLAN Segmentation</h1>
+        <p class="cs-hero-summary">Configured a simulated three-department office network with VLAN segmentation, 802.1Q trunking, router-on-a-stick routing, and DHCP. Verified cross-VLAN connectivity and network printer reachability using ping tests.</p>
+        <div class="cs-hero-tags">
+          <span class="cs-tag">Cisco Packet Tracer</span>
+          <span class="cs-tag">VLAN</span>
+          <span class="cs-tag">DHCP</span>
+          <span class="cs-tag">802.1Q</span>
+          <span class="cs-tag">Inter-VLAN Routing</span>
+          <span class="cs-tag">Cisco IOS</span>
+        </div>
+      </div>
+      <figure class="cs-hero-thumb">
+        <img src="assets/img/Project/small-office-network/01-Network-Topology.png"
+             alt="Cisco Packet Tracer small office network topology showing router, switch, and three VLAN-separated department groups (Sales, IT, Admin) with PC connections"
+             loading="eager">
+        <figcaption>Network topology — Cisco 2811 router with router-on-a-stick, Cisco 2960 switch with VLAN 10 (Sales), VLAN 20 (IT), VLAN 30 (Admin)</figcaption>
+      </figure>
+    </section>
+
+    <!-- ── Overview grid ── -->
+    <section class="cs-overview tinted">
+      <div class="wrap cs-overview-grid">
+        <div>
+          <p class="eyebrow">ENVIRONMENT</p>
+          <ul class="cs-env-list">
+            <li><strong>Simulator</strong> Cisco Packet Tracer 7.3.1</li>
+            <li><strong>Router</strong> Cisco 2811 with Cisco IOS</li>
+            <li><strong>Switch</strong> Cisco 2960 with VLAN trunking</li>
+            <li><strong>PCs</strong> 6 hosts across three departments</li>
+            <li><strong>Topology</strong> Router-on-a-stick inter-VLAN routing</li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow">TOPOLOGY</p>
+          <ul class="cs-env-list">
+            <li><strong>Sales VLAN 10</strong> 2 PCs, switch access ports Fa0/1 and Fa0/2</li>
+            <li><strong>IT VLAN 20</strong> 2 PCs, switch access ports Fa0/3 and Fa0/4</li>
+            <li><strong>Admin VLAN 30</strong> 1 PC + 1 network printer, switch access ports Fa0/5 and Fa0/6</li>
+            <li><strong>Trunk</strong> Switch Gig0/1 is an active 802.1Q trunk carrying VLANs 1, 10, 20, 30</li>
+            <li><strong>Router subinterfaces</strong> Fa0/0.10 (192.168.1.1/24 - Sales), Fa0/0.20 (192.168.2.1/24 - IT), Fa0/0.30 (192.168.3.1/24 - Admin)</li>
+          </ul>
+        </div>
+        <div>
+          <p class="eyebrow">DHCP</p>
+          <ul class="cs-env-list">
+            <li>DHCP pools configured for Sales, IT, and Admin on the router</li>
+            <li>.1 through .10 excluded in each subnet</li>
+            <li>Six automatic bindings verified: Sales (192.168.1.12, 192.168.1.13), IT (192.168.2.11, 192.168.2.12), Admin (192.168.3.11, 192.168.3.12)</li>
+            <li>Router advertises corresponding gateway IPs; DNS server 8.8.8.8 configured in DHCP pool examples</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Network Design Table ── -->
+    <section class="cs-section wrap">
+      <div class="cs-section-head">
+        <p class="eyebrow">NETWORK DESIGN</p>
+        <h2>VLAN and Subnet Configuration</h2>
+      </div>
+      <div class="cs-block">
+        <table>
+          <thead>
+            <tr>
+              <th>VLAN</th>
+              <th>Department</th>
+              <th>Subnet</th>
+              <th>Gateway</th>
+              <th>Access Ports</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10</td>
+              <td>Sales</td>
+              <td>192.168.1.0/24</td>
+              <td>192.168.1.1</td>
+              <td>Fa0/1, Fa0/2</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>IT</td>
+              <td>192.168.2.0/24</td>
+              <td>192.168.2.1</td>
+              <td>Fa0/3, Fa0/4</td>
+            </tr>
+            <tr>
+              <td>30</td>
+              <td>Admin</td>
+              <td>192.168.3.0/24</td>
+              <td>192.168.3.1</td>
+              <td>Fa0/5, Fa0/6</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Implementation ── -->
+    <section class="cs-section wrap" id="implementation">
+      <div class="cs-section-head">
+        <p class="eyebrow">IMPLEMENTATION</p>
+        <h2>What I configured</h2>
+      </div>
+
+      <!-- VLAN and Port Assignment -->
+      <div class="cs-block">
+        <h3>VLAN Creation and Port Assignment</h3>
+        <ul>
+          <li>Created VLAN 10 (Sales) on the Cisco 2960 switch</li>
+          <li>Created VLAN 20 (IT) on the Cisco 2960 switch</li>
+          <li>Created VLAN 30 (Admin) on the Cisco 2960 switch</li>
+          <li>Assigned switch access ports: Fa0/1 and Fa0/2 to VLAN 10</li>
+          <li>Assigned switch access ports: Fa0/3 and Fa0/4 to VLAN 20</li>
+          <li>Assigned switch access ports: Fa0/5 and Fa0/6 to VLAN 30</li>
+          <li>Configured Gig0/1 as an active 802.1Q trunk</li>
+          <li>VLANs 1, 10, 20, and 30 are active and forwarding on the trunk</li>
+        </ul>
+      </div>
+
+      <!-- Router Subinterfaces -->
+      <div class="cs-block">
+        <h3>Router-on-a-Stick (Router Subinterfaces)</h3>
+        <ul>
+          <li>Configured router physical interface Fa0/0 — link is up</li>
+          <li>Subinterface Fa0/0.10: encapsulation dot1Q 10, IP 192.168.1.1/24 (Sales gateway)</li>
+          <li>Subinterface Fa0/0.20: encapsulation dot1Q 20, IP 192.168.2.1/24 (IT gateway)</li>
+          <li>Subinterface Fa0/0.30: encapsulation dot1Q 30, IP 192.168.3.1/24 (Admin gateway)</li>
+          <li>This is router-on-a-stick inter-VLAN routing configuration</li>
+        </ul>
+      </div>
+
+      <!-- DHCP Configuration -->
+      <div class="cs-block">
+        <h3>DHCP Configuration</h3>
+        <ul>
+          <li>Configured DHCP pools for Sales, IT, and Admin on the router</li>
+          <li>Excluded .1 through .10 in each subnet</li>
+          <li>DHCP address assignment verified using show ip dhcp binding with six automatic bindings</li>
+          <li>Sales: 192.168.1.12, 192.168.1.13</li>
+          <li>IT: 192.168.2.11, 192.168.2.12</li>
+          <li>Admin: 192.168.3.11, 192.168.3.12</li>
+          <li>Router advertises corresponding gateway IPs</li>
+          <li>DNS server 8.8.8.8 was configured in the DHCP pool examples</li>
+          <li>Internet access and DNS resolution were not tested — stated only verified facts</li>
+        </ul>
+      </div>
+
+      <!-- Verification and Results -->
+      <div class="cs-block">
+        <h3>Verification and Results</h3>
+        <ul>
+          <li>Ping from a Sales PC to IT VLAN address 192.168.2.11: initial test 3/4 responses, repeated test 4/4</li>
+          <li>Ping from a Sales PC to Admin VLAN address 192.168.3.11: initial test 3/4 responses, repeated test 4/4</li>
+          <li>Ping from a Sales PC to printer address 192.168.3.12: initial test 3/4 responses, repeated test 4/4</li>
+          <li>The initial first-packet timeout is consistent with ARP resolution in Packet Tracer but is not definitively diagnosed; subsequent tests succeeded</li>
+          <li>These tests verify IP reachability to the tested devices</li>
+          <li>Do not claim actual printing was tested or that all possible VLAN-to-VLAN pairs were tested</li>
+        </ul>
+      </div>
+
+      <!-- Lessons Learned -->
+      <div class="cs-block">
+        <h3>Lessons Learned</h3>
+        <ul>
+          <li>Separation of layer 2 VLAN assignment from layer 3 routing</li>
+          <li>How trunking carries multiple VLANs over a single link</li>
+          <li>How DHCP distributes addresses per subnet with proper exclusions</li>
+          <li>How to verify rather than assume connectivity with ping tests</li>
+        </ul>
+      </div>
+
+      <!-- Evidence Gallery -->
+      <div class="cs-block">
+        <p class="eyebrow">EVIDENCE GALLERY</p>
+        <div class="cs-gallery">
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/02-VLAN-Configuration.png" class="cs-lightbox-trigger" title="VLAN Configuration">
+              <img src="assets/img/Project/small-office-network/02-VLAN-Configuration.png"
+                   alt="Cisco 2960 switch VLAN configuration showing VLAN 10 (Sales), VLAN 20 (IT), and VLAN 30 (Admin) assigned to switch ports">
+              <figcaption>VLAN Configuration</figcaption>
+            </a>
+          </div>
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/03-Trunk-Configuration.png" class="cs-lightbox-trigger" title="Trunk Configuration">
+              <img src="assets/img/Project/small-office-network/03-Trunk-Configuration.png"
+                   alt="Cisco 2960 switch trunk (Gig0/1) showing 802.1Q trunk carrying VLANs 1, 10, 20, 30">
+              <figcaption>Trunk Configuration</figcaption>
+            </a>
+          </div>
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/04A-Router-Subinterfaces.png" class="cs-lightbox-trigger" title="Router Subinterfaces">
+              <img src="assets/img/Project/small-office-network/04A-Router-Subinterfaces.png"
+                   alt="Cisco 2811 router show interfaces showing subinterfaces Fa0/0.10, Fa0/0.20, Fa0/0.30 with IP addresses">
+              <figcaption>Router Subinterfaces</figcaption>
+            </a>
+          </div>
+        </div>
+        <div class="cs-gallery cs-gallery--wide">
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/04B-Router-Dot1Q-Configuration.png" class="cs-lightbox-trigger" title="Router Dot1Q Configuration">
+              <img src="assets/img/Project/small-office-network/04B-Router-Dot1Q-Configuration.png"
+                   alt="Cisco 2811 router running config showing dot1Q encapsulation on subinterfaces Fa0/0.10, Fa0/0.20, Fa0/0.30">
+              <figcaption>Router Dot1Q Configuration</figcaption>
+            </a>
+          </div>
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/05-DHCP-Bindings.png" class="cs-lightbox-trigger" title="DHCP Bindings">
+              <img src="assets/img/Project/small-office-network/05-DHCP-Bindings.png"
+                   alt="Router show ip dhcp binding output showing six automatic bindings: Sales 192.168.1.12/13, IT 192.168.2.11/12, Admin 192.168.3.11/12">
+              <figcaption>DHCP Bindings</figcaption>
+            </a>
+          </div>
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/06A-InterVLAN-Sales-to-IT.png" class="cs-lightbox-trigger" title="Sales to IT Connectivity">
+              <img src="assets/img/Project/small-office-network/06A-InterVLAN-Sales-to-IT.png"
+                   alt="Ping test from Sales PC to IT VLAN address 192.168.2.11 showing successful 4/4 responses — cross-VLAN connectivity verified">
+              <figcaption>Sales to IT Connectivity</figcaption>
+            </a>
+          </div>
+        </div>
+        <div class="cs-gallery--wide">
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/06B-InterVLAN-Sales-to-Admin.png" class="cs-lightbox-trigger" title="Sales to Admin Connectivity">
+              <img src="assets/img/Project/small-office-network/06B-InterVLAN-Sales-to-Admin.png"
+                   alt="Ping test from Sales PC to Admin VLAN address 192.168.3.11 showing successful 4/4 responses — cross-VLAN connectivity verified">
+              <figcaption>Sales to Admin Connectivity</figcaption>
+            </a>
+          </div>
+          <div class="cs-shot">
+            <a href="assets/img/Project/small-office-network/07-Network-Printer-Connectivity.png" class="cs-lightbox-trigger" title="Network Printer Connectivity">
+              <img src="assets/img/Project/small-office-network/07-Network-Printer-Connectivity.png"
+                   alt="Ping test from Sales PC to network printer at 192.168.3.12 showing successful 4/4 responses — printer reachability verified">
+              <figcaption>Network Printer Connectivity</figcaption>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Download Packet Tracer Project ── -->
+    <section class="cs-section tinted" style="padding-block: 64px 0;">
+      <div class="wrap" style="max-width: 800px; margin: auto;">
+        <div class="cs-block" style="text-align: center;">
+          <h2>Download Project (.pkt)</h2>
+          <p class="cs-hero-summary" style="margin: 16px 0 24px; max-width: 600px; color: var(--muted); font-size: 15px;">
+            Cisco Packet Tracer project file for the Small Office Network Configuration and VLAN Segmentation lab.
+          </p>
+          <p style="margin: 8px 0 16px; color: var(--muted); font-size: 14px;">
+            <strong>Required:</strong> Cisco Packet Tracer 7.3.1 or later to open this file.
+          </p>
+          <div style="display: inline-flex; gap: 12px; align-items: center; justify-content: center;">
+            <a href="assets/img/Project/small-office-network/Small-Office-Network-VLAN-DHCP.pkt"
+               class="button"
+               style="background: var(--green); color: white; padding: 14px 28px; border-radius: 5px; font-size: 14px; font-weight: 600; text-decoration: none;"
+               download="Small-Office-Network-VLAN-DHCP.pkt">
+              Download .pkt
+            </a>
+            <span style="font-size: 12px; color: var(--muted);">
+              (~1MB) Requires Cisco Packet Tracer
+            </span>
+          </div>
+          <p style="margin: 24px 0 0; font-size: 13px; color: var(--muted);">
+            This is a <strong>personal, simulated networking lab in Cisco Packet Tracer</strong>, not a production network deployment or paid IT role. The .pkt file contains the Packet Tracer project configuration with three VLANs, router-on-a-stick routing, and DHCP pools.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Breadcrumb back ── -->
+    <div class="cs-breadcrumb wrap">
+      <a href="index.html#projects">← Back to Projects</a>
+    </div>
+
+  </main>
+
+  <!-- Lightbox overlay -->
+  <div class="cs-lightbox" id="cs-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer" hidden>
+    <button class="cs-lightbox-close" id="cs-lightbox-close" aria-label="Close screenshot viewer">✕</button>
+    <img class="cs-lightbox-img" id="cs-lightbox-img" src="" alt="">
+  </div>
+
+  <footer class="wrap">
+    <p>© 2026 Harvey Verian</p>
+    <p>Built around practice. Honest about progress.</p>
+    <a href="#home">Back to top ↑</a>
+  </footer>
+</body>
+</html>
